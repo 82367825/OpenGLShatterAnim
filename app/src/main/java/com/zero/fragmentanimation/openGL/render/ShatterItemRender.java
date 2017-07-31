@@ -11,18 +11,18 @@ import java.nio.FloatBuffer;
  * @date 2017/7/11
  */
 
-public class FragItemRender implements IFragItemRender {
+public class ShatterItemRender implements IShatterItemRender {
     
     FloatBuffer mVertFloatBuffer;
     FloatBuffer mTextureFloatBuffer;
     int mProgramPointer;
     int mDataSize;
     
-    public FragItemRender(int programPointer, float[] vertData, float[] textureData) {
+    public ShatterItemRender(int programPointer, float[] vertData, float[] textureData) {
         mProgramPointer = programPointer;
         mVertFloatBuffer = getFloatBuffer(vertData);
         mTextureFloatBuffer = getFloatBuffer(textureData);
-        mDataSize = vertData.length;
+        mDataSize = vertData.length / 3;
     }
     
     @Override
@@ -41,21 +41,21 @@ public class FragItemRender implements IFragItemRender {
                 3,       /* 一个顶点3个坐标值 */
                 GLES20.GL_FLOAT,
                 false,
-                3 * 4,   /* 一个顶点3个坐标值, 总共12个字节 */
+                0, 
                 mVertFloatBuffer);
-        GLES20.glDisableVertexAttribArray(positionCoordinateHandle);
+//        GLES20.glDisableVertexAttribArray(positionCoordinateHandle);
 
         /* 赋值纹理坐标 */
         int textureCoordinateHandle = GLES20.glGetAttribLocation(mProgramPointer, "a_TexCoordinate");
         GLES20.glEnableVertexAttribArray(textureCoordinateHandle);
         GLES20.glVertexAttribPointer(textureCoordinateHandle, 
-                3, 
+                2, 
                 GLES20.GL_FLOAT,
                 false,
-                3 * 4, 
+                0, 
                 mTextureFloatBuffer
         );
-        GLES20.glDisableVertexAttribArray(textureCoordinateHandle);
+//        GLES20.glDisableVertexAttribArray(textureCoordinateHandle);
         /* 绘制碎片 */
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, mDataSize);
     }

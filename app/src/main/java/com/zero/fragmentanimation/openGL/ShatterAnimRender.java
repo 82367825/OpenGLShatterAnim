@@ -4,11 +4,13 @@ import android.animation.ValueAnimator;
 import android.graphics.Bitmap;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.animation.LinearInterpolator;
 
 import com.zero.fragmentanimation.R;
-import com.zero.fragmentanimation.openGL.render.FragItemRender;
+import com.zero.fragmentanimation.openGL.render.ShatterItemRender;
 import com.zero.fragmentanimation.openGL.util.ShaderTools;
 import com.zero.fragmentanimation.openGL.util.TextureTools;
 import com.zero.fragmentanimation.openGL.util.VaryTools;
@@ -21,9 +23,9 @@ import javax.microedition.khronos.opengles.GL10;
  * @date 2017/7/11
  */
 
-public class FragAnimRender implements GLSurfaceView.Renderer {
+public class ShatterAnimRender implements GLSurfaceView.Renderer {
     
-    private static final String TAG = "FragAnimRender";
+    private static final String TAG = "ShatterAnimRender";
     
     private GLSurfaceView mGLSurfaceView;
     
@@ -43,42 +45,39 @@ public class FragAnimRender implements GLSurfaceView.Renderer {
     /* 动画执行类 */
     private ValueAnimator mValueAnimator;
     /* 动画进度 */
-    private float mMoveDistance;
-    private float mMoveMaxDistance;
+    private float mAnimFraction;
     
-    private FragItemRender mFragItemRender;
+    private ShatterItemRender mFragItemRender;
     
-    public FragAnimRender(GLSurfaceView glSurfaceView) {
+    public ShatterAnimRender(GLSurfaceView glSurfaceView) {
         this.mGLSurfaceView = glSurfaceView;
         this.mVaryTools = new VaryTools();
     }
     
-    private FragAnimListener mFragAnimListener;
-    public void setFragAnimListener(FragAnimListener fragAnimListener) {
+    private ShatterAnimListener mFragAnimListener;
+    public void setFragAnimListener(ShatterAnimListener fragAnimListener) {
         this.mFragAnimListener = fragAnimListener;
     }
     
     public void startAnimation(final Bitmap bitmap) {
         /* 主线程 */
-        mGLSurfaceView.post(new Runnable() {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                mMoveDistance = 0;
-                mMoveMaxDistance = mGLSurfaceView.getHeight() * 0.4f;
-                
-                mValueAnimator = ValueAnimator.ofFloat(0f, mMoveMaxDistance);
-                mValueAnimator.setDuration(1000);
+                mValueAnimator = ValueAnimator.ofFloat(0f, 2f);
+                mValueAnimator.setDuration(1500);
                 mValueAnimator.setInterpolator(new LinearInterpolator());
                 mValueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(ValueAnimator animation) {
-                        mMoveDistance = (float) animation.getAnimatedValue();
+                        mAnimFraction = (float) animation.getAnimatedValue();
                         mGLSurfaceView.requestRender();
                     }
                 });
                 mValueAnimator.start();
             }
         });
+        
         /* GL线程处理纹理加载 */
         /* 如果在UI线程里调用渲染器的方法，很容易收到“call to OpenGL ES API with no current context”的警告 */
         mGLSurfaceView.queueEvent(new Runnable() {
@@ -110,7 +109,7 @@ public class FragAnimRender implements GLSurfaceView.Renderer {
         GLES20.glEnable(GLES20.GL_CULL_FACE);
         /* 
          * 用于控制多边形的正面是如何决定的
-         * GL_CCW 表示窗口坐标上投影多边形的顶点顺序为逆时针方向的表面为正面。
+         * GL_CCW 表示窗口坐标上投影多边形的顶点顺序为逆时针方向的表面为正面
          * GL_CW 表示顶点顺序为顺时针方向的表面为正面
          */
         GLES20.glFrontFace(GLES20.GL_CW);
@@ -118,8 +117,7 @@ public class FragAnimRender implements GLSurfaceView.Renderer {
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         /* 加载顶点着色器以及片元着色器 */
         mProgramPointer = ShaderTools.createProgram(mGLSurfaceView.getContext(), 
-                R.raw.frag_vert, R.raw.frag_frag);
-        
+                R.raw.shatter_vert, R.raw.shatter_frag);
     }
 
     @Override
@@ -129,22 +127,17 @@ public class FragAnimRender implements GLSurfaceView.Renderer {
         /* 计算宽高比 */
         mRatioValue = (float) width / height;
         /* 设置视角矩阵 */
-        mVaryTools.setCamera(0f, 0f, 0f, 0f, 0f, 1f, 0f, 1f, 0f);
+        mVaryTools.setCamera(0f, 0f, 0f, 0f, 0f, 10f, 0f, 1f, 0f);
         /* 设置投影矩阵 */
         mVaryTools.frustum(-mRatioValue, mRatioValue, -1.0f, 1.0f, 1.0f, 10f);
-
+        
         mFragNumberX = 10;
         mFragNumberY = (int) (mFragNumberX / mRatioValue);
         
         /* GL线程初始化碎片数据 */
-        mGLSurfaceView.queueEvent(new Runnable() {
-            @Override
-            public void run() {
-                float[] vertData = initPositionData();
-                float[] textureData = initTextureData();
-                mFragItemRender = new FragItemRender(mProgramPointer, vertData, textureData);
-            }
-        });
+        float[] vertData = initPositionData();
+        float[] textureData = initTextureData();
+        mFragItemRender = new ShatterItemRender(mProgramPointer, vertData, textureData);
     }
 
     @Override
@@ -152,8 +145,16 @@ public class FragAnimRender implements GLSurfaceView.Renderer {
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         
-        if (mProgramPointer <= 0 || mTexturePointer <= 0 || mFragItemRender == null) {
-            Log.d(TAG, "params is null");
+        if (mProgramPointer <= 0) {
+            Log.d(TAG, "Program is not load.");
+            return ;
+        } 
+        if (mTexturePointer <= 0) {
+            Log.d(TAG, "Texture is not load.");
+            return ;
+        }
+        if (mFragItemRender == null) {
+            Log.d(TAG, "Frag item render is not init");
             return ;
         }
         
@@ -161,19 +162,15 @@ public class FragAnimRender implements GLSurfaceView.Renderer {
         GLES20.glUseProgram(mProgramPointer);
         Log.d(TAG, "load program");
         
-        /* 保护现场 */
         mVaryTools.pushMatrix();
         
-        /* 加载动画进度 */
-        int moveDistanceHandle = GLES20.glGetUniformLocation(mProgramPointer, "u_MoveDistance");
-        GLES20.glUniform1f(moveDistanceHandle, mMoveDistance);
-        int moveMaxDistanceHandle = GLES20.glGetAttribLocation(mProgramPointer, 
-                "u_MoveMaxDistance");
-        GLES20.glUniform1f(moveMaxDistanceHandle, mMoveMaxDistance);
+        /* 加载动画位移偏移值 */
+        int moveDistanceHandle = GLES20.glGetUniformLocation(mProgramPointer, "u_AnimationFraction");
+        GLES20.glUniform1f(moveDistanceHandle, mAnimFraction);
         
         /* 加载变换矩阵 */
         int mvpMatrixHandle = GLES20.glGetUniformLocation(mProgramPointer, "u_MVPMatrix");
-        mVaryTools.translate(0f, 0f, 5f);
+        mVaryTools.translate(0, 0, 1.0001f);
         GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, mVaryTools.getFinalMatrix(), 0);
 
         /* 加载纹理 */
@@ -185,7 +182,6 @@ public class FragAnimRender implements GLSurfaceView.Renderer {
         mFragItemRender.onRefreshRender();
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
         
-        /* 恢复现场 */
         mVaryTools.popMatrix();
     }
 
@@ -267,7 +263,7 @@ public class FragAnimRender implements GLSurfaceView.Renderer {
      * 初始化纹理坐标数据
      */
     private float[] initTextureData() {
-        float[] textureData = new float[6 * 3 * mFragNumberX * mFragNumberY];
+        float[] textureData = new float[6 * 2 * mFragNumberX * mFragNumberY];
 
         final float stepX = 1f / mFragNumberX;
         final float stepY = 1f / mFragNumberY;

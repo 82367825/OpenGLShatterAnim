@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.zero.fragmentanimation.R;
-import com.zero.fragmentanimation.openGL.FragAnimLayout;
+import com.zero.fragmentanimation.openGL.ShatterAnimLayout;
 
 /**
  * @author linzewu
@@ -14,7 +14,7 @@ import com.zero.fragmentanimation.openGL.FragAnimLayout;
 
 public class MainActivity extends Activity {
 
-    private FragAnimLayout mFragAnimLayout;
+    private ShatterAnimLayout mFragAnimLayout;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +30,7 @@ public class MainActivity extends Activity {
     }
     
     private void startAnimation() {
-        mFragAnimLayout = (FragAnimLayout) findViewById(R.id.main_layout);
+        mFragAnimLayout = (ShatterAnimLayout) findViewById(R.id.main_layout);
         mFragAnimLayout.startAnimation();
     }
 

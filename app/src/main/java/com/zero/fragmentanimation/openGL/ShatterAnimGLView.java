@@ -12,13 +12,13 @@ import android.util.AttributeSet;
  * @date 2017/7/11
  */
 
-public class FragAnimGLView extends GLSurfaceView {
+public class ShatterAnimGLView extends GLSurfaceView {
     
-    public FragAnimGLView(Context context) {
+    public ShatterAnimGLView(Context context) {
         super(context);
     }
 
-    public FragAnimGLView(Context context, AttributeSet attrs) {
+    public ShatterAnimGLView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
     

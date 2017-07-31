@@ -5,7 +5,7 @@ package com.zero.fragmentanimation.openGL;
  * @date 2017/7/18
  */
 
-public interface FragAnimListener {
+public interface ShatterAnimListener {
 
     /**
      * 动画开始

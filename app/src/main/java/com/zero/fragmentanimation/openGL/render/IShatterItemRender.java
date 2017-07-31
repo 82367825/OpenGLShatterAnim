@@ -5,7 +5,7 @@ package com.zero.fragmentanimation.openGL.render;
  * @date 2017/7/11
  */
 
-public interface IFragItemRender {
+public interface IShatterItemRender {
     
     void onRefreshRender();
     

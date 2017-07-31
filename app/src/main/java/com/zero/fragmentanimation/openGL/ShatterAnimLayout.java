@@ -11,22 +11,22 @@ import android.widget.FrameLayout;
  * @date 2017/7/11
  */
 
-public class FragAnimLayout extends FrameLayout {
+public class ShatterAnimLayout extends FrameLayout {
     
-    private FragAnimGLView mFragAnimGLView;
-    private FragAnimRender mFragAnimRender;
+    private ShatterAnimGLView mFragAnimGLView;
+    private ShatterAnimRender mFragAnimRender;
     
-    public FragAnimLayout(Context context) {
+    public ShatterAnimLayout(Context context) {
         super(context);
         initView();
     }
 
-    public FragAnimLayout(Context context, AttributeSet attrs) {
+    public ShatterAnimLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         initView();
     }
 
-    public FragAnimLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+    public ShatterAnimLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initView();
     }
@@ -38,8 +38,8 @@ public class FragAnimLayout extends FrameLayout {
     }
     
     private void initView() {
-        mFragAnimGLView = new FragAnimGLView(getContext());
-        mFragAnimRender = new FragAnimRender(mFragAnimGLView);
+        mFragAnimGLView = new ShatterAnimGLView(getContext());
+        mFragAnimRender = new ShatterAnimRender(mFragAnimGLView);
         mFragAnimGLView.initGLSurfaceView(mFragAnimRender);
     }
     

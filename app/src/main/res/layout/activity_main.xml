@@ -4,12 +4,13 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <com.zero.fragmentanimation.openGL.FragAnimLayout
+    <com.zero.fragmentanimation.openGL.ShatterAnimLayout
         android:id="@+id/main_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         
         <LinearLayout
+            android:background="@android:color/darker_gray"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -30,7 +31,7 @@
         </LinearLayout>
         
         
-    </com.zero.fragmentanimation.openGL.FragAnimLayout>
+    </com.zero.fragmentanimation.openGL.ShatterAnimLayout>
     
     
 </LinearLayout>
