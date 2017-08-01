@@ -1,5 +1,5 @@
 uniform mat4 u_MVPMatrix;    //变换矩阵
-uniform float u_AnimationFraction;
+uniform float u_AnimationFraction;  //动画进度
 attribute vec4 a_Position;   //顶点坐标
 attribute vec2 a_TexCoordinate; //纹理坐标
 
@@ -19,7 +19,6 @@ void main()
    finalPosition.x = finalPosition.x + randomValue * 0.2;
    //碎片随机加速
    finalPosition.y = finalPosition.y - u_AnimationFraction - finalPosition.z * 0.2 * u_AnimationFraction;
-   
    finalPosition.z = finalPosition.z * (u_AnimationFraction / 2.0) * 0.1;
    
    gl_Position = u_MVPMatrix * finalPosition;
