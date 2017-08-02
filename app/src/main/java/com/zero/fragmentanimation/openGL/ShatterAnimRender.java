@@ -1,5 +1,6 @@
 package com.zero.fragmentanimation.openGL;
 
+import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.graphics.Bitmap;
 import android.opengl.GLES20;
@@ -54,9 +55,9 @@ public class ShatterAnimRender implements GLSurfaceView.Renderer {
         this.mVaryTools = new VaryTools();
     }
     
-    private ShatterAnimListener mFragAnimListener;
-    public void setFragAnimListener(ShatterAnimListener fragAnimListener) {
-        this.mFragAnimListener = fragAnimListener;
+    private ShatterAnimListener mShatterAnimListener;
+    public void setShatterAnimListener(ShatterAnimListener shatterAnimListener) {
+        this.mShatterAnimListener = shatterAnimListener;
     }
     
     public void startAnimation(final Bitmap bitmap) {
@@ -74,7 +75,33 @@ public class ShatterAnimRender implements GLSurfaceView.Renderer {
                         mGLSurfaceView.requestRender();
                     }
                 });
+                mValueAnimator.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        if (mShatterAnimListener != null) {
+                            mShatterAnimListener.onAnimFinish();
+                        }
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                });
                 mValueAnimator.start();
+                if (mShatterAnimListener != null) {
+                    mShatterAnimListener.onAnimStart();
+                }
             }
         });
         
@@ -131,7 +158,7 @@ public class ShatterAnimRender implements GLSurfaceView.Renderer {
         /* 设置投影矩阵 */
         mVaryTools.frustum(-mRatioValue, mRatioValue, -1.0f, 1.0f, 1.0f, 10f);
         
-        mFragNumberX = 10;
+        mFragNumberX = 20;
         mFragNumberY = (int) (mFragNumberX / mRatioValue);
         
         /* GL线程初始化碎片数据 */

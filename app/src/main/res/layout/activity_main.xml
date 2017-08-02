@@ -10,7 +10,7 @@
         android:layout_height="match_parent">
         
         <LinearLayout
-            android:background="@android:color/darker_gray"
+            android:background="@drawable/main_bg"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -21,11 +21,6 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="60dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            
-            <ImageView
-                android:src="@drawable/main_bg"
-                android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
             
         </LinearLayout>
